@@ -354,7 +354,7 @@ _%>
         <%_ if (dto === 'mapstruct') { _%>
         <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);
         <%_ } _%>
-        rest<%= entityClass %>MockMvc.perform(post("/api/<%= entityApiUrl %>")
+        rest<%= entityClass %>MockMvc.perform(post("/api/private/entity/<%= entityApiUrl %>")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(<%= entityInstance %><% if (dto === 'mapstruct') { %>DTO<% } %>)))
             .andExpect(status().isCreated());
@@ -392,7 +392,7 @@ _%>
         <%_ } _%>
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        rest<%= entityClass %>MockMvc.perform(post("/api/<%= entityApiUrl %>")
+        rest<%= entityClass %>MockMvc.perform(post("/api/private/entity/<%= entityApiUrl %>")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(<%= entityInstance %><% if (dto === 'mapstruct') { %>DTO<% } %>)))
             .andExpect(status().isBadRequest());
@@ -417,7 +417,7 @@ _%>
         // Create the <%= entityClass %>, which fails.<% if (dto === 'mapstruct') { %>
         <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);<% } %>
 
-        rest<%= entityClass %>MockMvc.perform(post("/api/<%= entityApiUrl %>")
+        rest<%= entityClass %>MockMvc.perform(post("/api/private/entity/<%= entityApiUrl %>")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(<%= entityInstance %><% if (dto === 'mapstruct') { %>DTO<% } %>)))
             .andExpect(status().isBadRequest());
@@ -433,7 +433,7 @@ _%>
         <%= entityInstance %>Repository.save<% if (databaseType === 'sql') { %>AndFlush<% } %>(<%= entityInstance %>);
 
         // Get all the <%= entityInstance %>List
-        rest<%= entityClass %>MockMvc.perform(get("/api/<%= entityApiUrl %><% if (databaseType !== 'cassandra') { %>?sort=id,desc<% } %>"))
+        rest<%= entityClass %>MockMvc.perform(get("/api/private/entity/<%= entityApiUrl %><% if (databaseType !== 'cassandra') { %>?sort=id,desc<% } %>"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))<% if (databaseType === 'sql') { %>
             .andExpect(jsonPath("$.[*].id").value(hasItem(<%= entityInstance %>.getId().intValue())))<% } %><% if (databaseType === 'mongodb') { %>
@@ -452,7 +452,7 @@ _%>
         <%= entityInstance %>Repository.save<% if (databaseType === 'sql') { %>AndFlush<% } %>(<%= entityInstance %>);
 
         // Get the <%= entityInstance %>
-        rest<%= entityClass %>MockMvc.perform(get("/api/<%= entityApiUrl %>/{id}", <%= entityInstance %>.getId()))
+        rest<%= entityClass %>MockMvc.perform(get("/api/private/entity/<%= entityApiUrl %>/{id}", <%= entityInstance %>.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))<% if (databaseType === 'sql') { %>
             .andExpect(jsonPath("$.id").value(<%= entityInstance %>.getId().intValue()))<% } %><% if (databaseType === 'mongodb') { %>
@@ -510,7 +510,7 @@ _%>
 <%_
             }
             // the range criterias
-            if (['Byte', 'Short', 'Integer', 'Long', 'LocalDate', 'ZonedDateTime'].includes(searchBy.fieldType)) { 
+            if (['Byte', 'Short', 'Integer', 'Long', 'LocalDate', 'ZonedDateTime'].includes(searchBy.fieldType)) {
               var defaultValue = 'DEFAULT_' + searchBy.fieldNameUnderscored.toUpperCase();
               var biggerValue = 'UPDATED_' + searchBy.fieldNameUnderscored.toUpperCase();
               if (searchBy.fieldValidate === true && searchBy.fieldValidateRules.includes('max')) {
@@ -552,7 +552,7 @@ _%>
      * Executes the search, and checks that the default entity is returned
      */
     private void default<%= entityClass %>ShouldBeFound(String filter) throws Exception {
-        rest<%= entityClass %>MockMvc.perform(get("/api/<%= entityApiUrl %>?sort=id,desc&" + filter))
+        rest<%= entityClass %>MockMvc.perform(get("/api/private/entity/<%= entityApiUrl %>?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(<%= entityInstance %>.getId().intValue())))<% fields.forEach((field) => { %>
@@ -566,7 +566,7 @@ _%>
      * Executes the search, and checks that the default entity is not returned
      */
     private void default<%= entityClass %>ShouldNotBeFound(String filter) throws Exception {
-        rest<%= entityClass %>MockMvc.perform(get("/api/<%= entityApiUrl %>?sort=id,desc&" + filter))
+        rest<%= entityClass %>MockMvc.perform(get("/api/private/entity/<%= entityApiUrl %>?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -579,7 +579,7 @@ _%>
     @Transactional<% } %>
     public void getNonExisting<%= entityClass %>() throws Exception {
         // Get the <%= entityInstance %>
-        rest<%= entityClass %>MockMvc.perform(get("/api/<%= entityApiUrl %>/{id}", <% if (databaseType === 'sql' || databaseType === 'mongodb') { %>Long.MAX_VALUE<% } %><% if (databaseType === 'cassandra') { %>UUID.randomUUID().toString()<% } %>))
+        rest<%= entityClass %>MockMvc.perform(get("/api/private/entity/<%= entityApiUrl %>/{id}", <% if (databaseType === 'sql' || databaseType === 'mongodb') { %>Long.MAX_VALUE<% } %><% if (databaseType === 'cassandra') { %>UUID.randomUUID().toString()<% } %>))
             .andExpect(status().isNotFound());
     }
 
@@ -614,7 +614,7 @@ _%>
         <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(updated<%= entityClass %>);
         <%_ } _%>
 
-        rest<%= entityClass %>MockMvc.perform(put("/api/<%= entityApiUrl %>")
+        rest<%= entityClass %>MockMvc.perform(put("/api/private/entity/<%= entityApiUrl %>")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(<% if (dto === 'mapstruct') { %><%= entityInstance %>DTO<% } else { %>updated<%= entityClass %><% } %>)))
             .andExpect(status().isOk());
@@ -649,7 +649,7 @@ _%>
         <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);<% } %>
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
-        rest<%= entityClass %>MockMvc.perform(put("/api/<%= entityApiUrl %>")
+        rest<%= entityClass %>MockMvc.perform(put("/api/private/entity/<%= entityApiUrl %>")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(<%= entityInstance %><% if (dto === 'mapstruct') { %>DTO<% } %>)))
             .andExpect(status().isCreated());
@@ -673,7 +673,7 @@ _%>
         int databaseSizeBeforeDelete = <%= entityInstance %>Repository.findAll().size();
 
         // Get the <%= entityInstance %>
-        rest<%= entityClass %>MockMvc.perform(delete("/api/<%= entityApiUrl %>/{id}", <%= entityInstance %>.getId())
+        rest<%= entityClass %>MockMvc.perform(delete("/api/private/entity/<%= entityApiUrl %>/{id}", <%= entityInstance %>.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());<% if (searchEngine === 'elasticsearch') { %>
 
@@ -698,7 +698,7 @@ _%>
 <%_ } _%>
 
         // Search the <%= entityInstance %>
-        rest<%= entityClass %>MockMvc.perform(get("/api/_search/<%= entityApiUrl %>?query=id:" + <%= entityInstance %>.getId()))
+        rest<%= entityClass %>MockMvc.perform(get("/api/private/entity/_search/<%= entityApiUrl %>?query=id:" + <%= entityInstance %>.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))<% if (databaseType === 'sql') { %>
             .andExpect(jsonPath("$.[*].id").value(hasItem(<%= entityInstance %>.getId().intValue())))<% } %><% if (databaseType === 'mongodb') { %>

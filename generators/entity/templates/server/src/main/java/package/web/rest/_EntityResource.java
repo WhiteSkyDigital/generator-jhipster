@@ -70,7 +70,7 @@ import static org.elasticsearch.index.query.QueryBuilders.*;<% } %>
  * REST controller for managing <%= entityClass %>.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/private/entity")
 public class <%= entityClass %>Resource {
 
     private final Logger log = LoggerFactory.getLogger(<%= entityClass %>Resource.class);
@@ -95,7 +95,7 @@ public class <%= entityClass %>Resource {
         if (<%= instanceName %>.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new <%= entityInstance %> cannot already have an ID")).body(null);
         }<%- include('../../common/save_template', {viaService: viaService, returnDirectly: false}); -%>
-        return ResponseEntity.created(new URI("/api/<%= entityApiUrl %>/" + result.getId()))
+        return ResponseEntity.created(new URI("/api/private/entity/<%= entityApiUrl %>/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }

@@ -69,6 +69,9 @@ Object.keys(uniqueEnums).forEach(function(element) { _%>
 import <%=packageName%>.domain.enumeration.<%= element %>;
 <%_ }); _%>
 
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 <%_ if (typeof javadoc == 'undefined') { _%>
 /**
  * A <%= entityClass %>.
@@ -94,6 +97,7 @@ import <%=packageName%>.domain.enumeration.<%= element %>;
 <%_ } if (searchEngine === 'elasticsearch') { _%>
 @Document(indexName = "<%= entityInstance.toLowerCase() %>")
 <%_ } _%>
+@EntityListeners(AuditingEntityListener.class)
 public class <%= entityClass %> implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -143,8 +147,11 @@ public class <%= entityClass %> implements Serializable {
         if (fieldType === 'byte[]') { _%>
     @Lob
         <%_ }
+    if (fieldName === 'dateModified') { _%>
+    @LastModifiedDate
+        <%_ }
         if (['Instant', 'ZonedDateTime', 'LocalDate'].includes(fieldType)) { _%>
-    @Column(name = "<%-fieldNameAsDatabaseColumn %>"<% if (required) { %>, nullable = false<% } %>)
+    @Column(name = "<%-fieldNameAsDatabaseColumn %>"<% if (required) { %>, nullable = false<% } if (['dateCreated','extDateTime'].includes(fieldName)){ %>, insertable = false, updatable = false<% } %>)
         <%_ } else if (fieldType === 'BigDecimal') { _%>
     @Column(name = "<%-fieldNameAsDatabaseColumn %>", precision=10, scale=2<% if (required) { %>, nullable = false<% } %>)
         <%_ } else { _%>
