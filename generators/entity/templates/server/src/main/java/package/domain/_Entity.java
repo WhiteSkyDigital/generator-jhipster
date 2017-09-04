@@ -70,6 +70,8 @@ import <%=packageName%>.domain.enumeration.<%= element %>;
 <%_ }); _%>
 
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 <%_ if (typeof javadoc == 'undefined') { _%>
@@ -150,6 +152,12 @@ public class <%= entityClass %> implements Serializable {
     if (fieldName === 'dateModified') { _%>
     @LastModifiedDate
         <%_ }
+    if (fieldName === 'modifiedBy') { _%>
+    @LastModifiedBy
+        <%_ }
+    if (fieldName === 'createdBy') { _%>
+    @CreatedBy
+    <%_ }
         if (['Instant', 'ZonedDateTime', 'LocalDate'].includes(fieldType)) { _%>
     @Column(name = "<%-fieldNameAsDatabaseColumn %>"<% if (required) { %>, nullable = false<% } if (['dateCreated','extDateTime'].includes(fieldName)){ %>, insertable = false, updatable = false<% } %>)
         <%_ } else if (fieldType === 'BigDecimal') { _%>
