@@ -74,7 +74,7 @@
             } else if (fieldType === 'Double') {
                 columnType="double";
             } else if (fieldType === 'BigDecimal') {
-                columnType="decimal(10,2)";
+                columnType="decimal(18,2)";
             } else if (fieldType === 'LocalDate') {
                 columnType="date";
             } else if (fieldType === 'Instant') {
@@ -124,29 +124,29 @@
         </createTable>
         <%_ for (const idx in fields) {
             if (fields[idx].fieldType === 'ZonedDateTime' || fields[idx].fieldType === 'Instant') { _%>
-        <dropDefaultValue tableName="<%= entityTableName %>" columnName="<%=fields[idx].fieldNameAsDatabaseColumn %>" columnDataType="datetime"/>
-        <%_ }
-        } _%>
-        <% for (idx in relationships) {
-            const relationshipType = relationships[idx].relationshipType,
-            relationshipName = relationships[idx].relationshipName,
-            ownerSide = relationships[idx].ownerSide,
-            otherEntityName = relationships[idx].otherEntityName;
-            if (relationshipType === 'many-to-many' && ownerSide) {
-                const joinTableName = getJoinTableName(name, relationshipName, prodDatabaseType);
-          _%>
+    <!-- <dropDefaultValue tableName="<%= entityTableName %>" columnName="<%=fields[idx].fieldNameAsDatabaseColumn %>" columnDataType="datetime"/> -->
+     <%_ }
+     } _%>
+     <% for (idx in relationships) {
+         const relationshipType = relationships[idx].relationshipType,
+         relationshipName = relationships[idx].relationshipName,
+         ownerSide = relationships[idx].ownerSide,
+         otherEntityName = relationships[idx].otherEntityName;
+         if (relationshipType === 'many-to-many' && ownerSide) {
+             const joinTableName = getJoinTableName(name, relationshipName, prodDatabaseType);
+       _%>
 
-        <createTable tableName="<%= joinTableName %>">
-            <column name="<%= getPluralColumnName(relationshipName) %>_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="<%= getPluralColumnName(name) %>_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
+     <createTable tableName="<%= joinTableName %>">
+         <column name="<%= getPluralColumnName(relationshipName) %>_id" type="bigint">
+             <constraints nullable="false"/>
+         </column>
+         <column name="<%= getPluralColumnName(name) %>_id" type="bigint">
+             <constraints nullable="false"/>
+         </column>
+     </createTable>
 
-        <addPrimaryKey columnNames="<%= getPluralColumnName(name) %>_id, <%= getPluralColumnName(relationshipName) %>_id" tableName="<%= joinTableName %>"/>
-        <% } %><% } %>
-    </changeSet>
-    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here, do not remove-->
+     <addPrimaryKey columnNames="<%= getPluralColumnName(name) %>_id, <%= getPluralColumnName(relationshipName) %>_id" tableName="<%= joinTableName %>"/>
+     <% } %><% } %>
+ </changeSet>
+ <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here, do not remove-->
 </databaseChangeLog>
