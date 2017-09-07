@@ -60,6 +60,7 @@
                 maxlength = fields[idx].fieldValidateRulesMaxlength;
             }
             const fieldType = fields[idx].fieldType;
+            const fieldName = fields[idx].fieldName;
             const fieldTypeBlobContent = fields[idx].fieldTypeBlobContent;
             const columnName = fields[idx].fieldNameAsDatabaseColumn;
             let columnType;
@@ -97,9 +98,15 @@
                 }
             }
             %>
+            <%_ if (fieldName === 'dateCreated' && fieldName !== 'extDateTime') { _%>
+            <column name="<%=columnName %>" type="<%=columnType %>" defaultValue="now()">
+                <constraints nullable="<%= nullable %>" />
+            </column>
+            <%_ } else { _%>
             <column name="<%=columnName %>" type="<%=columnType %>">
                 <constraints nullable="<%= nullable %>" />
             </column>
+            <%_ }  _%>
             <%_ if (fieldType === 'byte[]' && fieldTypeBlobContent !== 'text') { _%>
             <column name="<%=columnName %>_content_type" type="varchar(255)">
                 <constraints nullable="<%= nullable %>" />
