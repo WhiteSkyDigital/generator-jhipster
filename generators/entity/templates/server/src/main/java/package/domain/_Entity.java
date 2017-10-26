@@ -52,6 +52,10 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 <%_ } if (fieldsContainInstant === true) { _%>
 import java.time.Instant;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 <%_ } if (fieldsContainLocalDate === true) { _%>
 import java.time.LocalDate;
 <%_ } if (fieldsContainZonedDateTime === true) { _%>
@@ -63,16 +67,16 @@ import java.util.Set;
 import java.util.Objects;
 <%_ if (databaseType === 'cassandra') { _%>
 import java.util.UUID;
+<%_ }if (fieldsContainBlob && (devDatabaseType === 'postgresql' || prodDatabaseType === 'postgresql')) { _%>
+import org.hibernate.annotations.Type;
 <%_ }
 Object.keys(uniqueEnums).forEach(function(element) { _%>
 
 import <%=packageName%>.domain.enumeration.<%= element %>;
 <%_ }); _%>
 
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+
 
 <%_ if (typeof javadoc == 'undefined') { _%>
 /**
@@ -149,6 +153,10 @@ public class <%= entityClass %> implements Serializable {
         if (fieldType === 'byte[]') { _%>
     @Lob
         <%_ }
+    if (fieldType === 'byte[]' && fieldTypeBlobContent==='text' && (devDatabaseType === 'postgresql' || prodDatabaseType === 'postgresql') ) { _%>
+    @Type(type = "text")
+    <%_ }
+
     if (fieldName === 'dateModified') { _%>
     @LastModifiedDate
         <%_ }
