@@ -178,7 +178,7 @@ public class <%= entityClass %> implements Serializable {
     @Field("<%=fieldNameUnderscored %>")
     <%_ } _%>
     <%_ if (fieldTypeBlobContent !== 'text') { _%>
-    private <%= fieldType %> <%= fieldName %>;
+    private <%= fieldType %> <%= fieldName %><% if (fieldType.toLowerCase() === 'boolean') { %> = false<% } %>;
     <%_ } else { _%>
     private String <%= fieldName %>;
     <%_ } _%>
